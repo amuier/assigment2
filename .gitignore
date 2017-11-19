@@ -1,0 +1,7 @@
+# Compiled class file
+cs231n/datasets/cifar-10-python.tar.gz
+cs231n/datasets/cifar-10-batches-py/*
+cs231n/__pycache__/*
+cs231n/build/*
+cs231n/classifiers/__pycache__
+.ipynb_checkpoints/*
