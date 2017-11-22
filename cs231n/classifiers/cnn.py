@@ -60,8 +60,8 @@ class ThreeLayerConvNet(object):
 		############################################################################
 
 		for k, v in self.params.items():
-		  self.params[k] = v.astype(dtype)
-     
+			self.params[k] = v.astype(dtype)
+
  
 	def loss(self, X, y=None):
 		"""
@@ -75,7 +75,7 @@ class ThreeLayerConvNet(object):
 
 		# pass conv_param to the forward pass for the convolutional layer
 		filter_size = W1.shape[2]
-		conv_param = {'stride': 1, 'pad': (filter_size - 1) / 2}
+		conv_param = {'stride': 1, 'pad': (filter_size - 1) // 2}
 
 		# pass pool_param to the forward pass for the max-pooling layer
 		pool_param = {'pool_height': 2, 'pool_width': 2, 'stride': 2}
@@ -94,7 +94,7 @@ class ThreeLayerConvNet(object):
 		############################################################################
 
 		if y is None:
-		  return scores
+			return scores
 
 		loss, grads = 0, {}
 		############################################################################
@@ -103,11 +103,23 @@ class ThreeLayerConvNet(object):
 		# data loss using softmax, and make sure that grads[k] holds the gradients #
 		# for self.params[k]. Don't forget to add L2 regularization!               #
 		############################################################################
-		pass
+
+		data_loss, dscores = softmax_loss(scores, y)
+		da2, dW3, db3 = affine_backward(dscores, cache3)
+		da1, dW2, db2 = affine_relu_backward(da2, cache2)
+		dX, dW1, db1 = conv_relu_pool_backward(da1, cache1)
+
+		#Add regularization
+		dW1 += self.reg * W1
+		dW2 += self.reg * W2
+		dW3 += self.reg * W3
+		reg_loss = 0.5 * self.reg * sum(np.sum(W * W) for W in [W1, W2, W3])
+
+		loss = data_loss + reg_loss
+		grads = {'W1': dW1, 'b1': db1, 'W2': dW2, 'b2': db2, 'W3': dW3, 'b3': db3}
 		############################################################################
 		#                             END OF YOUR CODE                             #
 		############################################################################
-
 		return loss, grads
   
   
